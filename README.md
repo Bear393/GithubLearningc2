@@ -1,10 +1,14 @@
 # GithubLearningc2
+Updated 20 Sep 2025 11:16
 
 ## To Do
-1. Create your first index.html file
+- [x] Create your first index.html file
+- [ ] Create style.css
 
 ## Tips
-Always use simple name, helps others to remember.
+1. Always use simple name
+	1. Helps others to remember
+	2. :joy:
 
 ## Resources
 1. [Git Tutorial][1]
