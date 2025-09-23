@@ -1,4 +1,74 @@
-<title>Default HTML Page</title>
-Updated 20 Sep 2025 11:13
-<H1>FAQ</H1>
-<ul>How to publish this web page</ul>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My To-Do List</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>My To-Do List</h1>
+    </header>
+    <main>
+        <!-- Task input section -->
+        <section id="task-input-section">
+            <h2>Add Task</h2>
+            <form id="task-form" class="task-form">
+                <div class="input-group">
+                    <input
+                        type="text"
+                        id="task-input"
+                        class="task-input"
+                        placeholder="What needs to be done?"
+                        maxlength="500"
+                        required
+                    >
+                    <button type="submit" id="add-task-btn" class="add-btn">
+                        Add Task
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Task list section -->
+        <section id="task-list-section">
+            <h2>Tasks</h2>
+
+            <!-- Filter buttons -->
+            <div class="filter-controls">
+                <button id="filter-all" class="filter-btn active" data-filter="all">
+                    All
+                </button>
+                <button id="filter-active" class="filter-btn" data-filter="active">
+                    Active
+                </button>
+                <button id="filter-completed" class="filter-btn" data-filter="completed">
+                    Completed
+                </button>
+            </div>
+
+            <!-- Task counter -->
+            <div class="task-counter">
+                <span id="task-count">0 tasks</span>
+            </div>
+
+            <!-- Task list container -->
+            <ul id="task-list" class="task-list">
+                <!-- Tasks will be dynamically added here -->
+            </ul>
+
+            <!-- Additional controls -->
+            <div class="list-controls">
+                <button id="clear-completed" class="clear-btn">
+                    Clear Completed
+                </button>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 My To-Do List App. Educational project for learning web development.</p>
+    </footer>
+    <script src="app.js"></script>
+</body>
+</html>
