@@ -13,7 +13,8 @@
 const appState = {
     tasks: [],           // Array to hold all tasks
     currentFilter: 'all', // Current filter: 'all', 'active', 'completed'
-    editingTaskId: null  // ID of task currently being edited
+    editingTaskId: null,  // ID of task currently being edited
+    theme: null          // 'light' or 'dark' - resolved on initialization
 };
 
 /**
@@ -352,7 +353,8 @@ class TaskList {
                 version: '1.0.0',
                 lastSaved: new Date().toISOString(),
                 settings: {
-                    currentFilter: appState.currentFilter
+                    currentFilter: appState.currentFilter,
+                    theme: appState.theme || 'light'
                 }
             };
 
@@ -409,6 +411,10 @@ class TaskList {
             // Restore settings if available
             if (parsedData.settings) {
                 appState.currentFilter = parsedData.settings.currentFilter || 'all';
+                const storedTheme = parsedData.settings.theme;
+                if (storedTheme === 'dark' || storedTheme === 'light') {
+                    appState.theme = storedTheme;
+                }
                 this.updateFilterButtons();
             }
 
@@ -579,6 +585,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set up event handlers
     setupEventHandlers();
 
+    // Initialize theme preference
+    initializeTheme();
+
     // Educational Note: Render initial state
     todoApp.renderTasks();
 
@@ -618,7 +627,73 @@ function setupEventHandlers() {
     // Keyboard shortcuts
     document.addEventListener('keydown', handleKeyboardShortcuts);
 
+    // Theme toggle button
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', handleThemeToggle);
+    }
+
     console.log('Event handlers set up successfully');
+}
+
+/**
+ * Initialize theme based on saved preference or system settings
+ */
+function initializeTheme() {
+    let resolvedTheme = appState.theme;
+
+    if (resolvedTheme !== 'light' && resolvedTheme !== 'dark') {
+        const prefersDark =
+            window.matchMedia &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        resolvedTheme = prefersDark ? 'dark' : 'light';
+    }
+
+    setTheme(resolvedTheme);
+}
+
+/**
+ * Apply selected theme to the document
+ */
+function setTheme(theme) {
+    const normalizedTheme = theme === 'dark' ? 'dark' : 'light';
+    appState.theme = normalizedTheme;
+
+    document.body.classList.toggle('dark-mode', normalizedTheme === 'dark');
+    updateThemeToggleButton();
+}
+
+/**
+ * Update the theme toggle button icon and accessible labels
+ */
+function updateThemeToggleButton() {
+    const themeToggle = document.getElementById('theme-toggle');
+    if (!themeToggle) return;
+
+    const isDark = appState.theme === 'dark';
+    const iconElement = themeToggle.querySelector('.theme-icon');
+
+    if (iconElement) {
+        iconElement.textContent = isDark ? '☀️' : '🌙';
+    }
+
+    const label = isDark ? 'Switch to light mode' : 'Switch to dark mode';
+    themeToggle.setAttribute('aria-label', label);
+    themeToggle.setAttribute('title', label);
+    themeToggle.setAttribute('aria-pressed', String(isDark));
+}
+
+/**
+ * Handle theme toggle button click
+ */
+function handleThemeToggle() {
+    const newTheme = appState.theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+
+    if (todoApp) {
+        todoApp.saveToStorage();
+    }
 }
 
 /**
