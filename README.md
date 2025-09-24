@@ -1,7 +1,7 @@
 # GithubLearningc2
 My personal project for building a simple to-do list web app while learning Git, HTML, CSS, and JavaScript fundamentals at my own pace.
 
-Updated 24 Sep 2025 15:00
+Updated 24 Sep 2025 16:30
 
 ## Project Overview
 This repository chronicles the minimalist task manager I am crafting to run entirely in the browser. It is tailored specifically for how I like to organize tasks and experiment with GitHub workflows.
@@ -60,7 +60,7 @@ Follow the steps below to preview the static site at `http://localhost:3000`.
 
 ## To Do
 - [x] Create your first index.html file
-- [ ] Create style.css
+- [x] Create style.css
 
 ## Tips
 1. Always use simple name
