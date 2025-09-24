@@ -8,17 +8,47 @@
 </head>
 <body>
     <header>
-        <div class="header-content">
-            <h1>My To-Do List</h1>
-            <button
-                id="theme-toggle"
-                class="theme-toggle"
-                type="button"
-                aria-label="Switch to dark mode"
-                title="Switch to dark mode"
-            >
-                <span class="theme-icon" aria-hidden="true">🌙</span>
-            </button>
+        <div class="header-shell">
+            <div class="header-content">
+                <div class="brand">
+                    <span class="logo-mark" aria-hidden="true">
+                        <svg
+                            class="logo-icon"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                            focusable="false"
+                        >
+                            <path
+                                class="logo-icon__check"
+                                d="M6 12.5L10.25 16.5 18 8.75"
+                                fill="none"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+                    </span>
+                    <h1 class="app-title">My To-Do List</h1>
+                </div>
+            </div>
+            <div class="theme-toggle-container theme-toggle-container--desktop">
+                <button
+                    id="theme-toggle-desktop"
+                    class="theme-toggle"
+                    type="button"
+                    role="switch"
+                    data-theme-toggle="desktop"
+                    aria-label="Switch to dark mode"
+                    aria-checked="false"
+                    title="Switch to dark mode"
+                >
+                    <span class="sr-only">Toggle light and dark theme</span>
+                    <span class="theme-toggle__track" aria-hidden="true">
+                        <span class="theme-toggle__thumb"></span>
+                        <span class="theme-toggle__icon theme-toggle__icon--sun">☀️</span>
+                        <span class="theme-toggle__icon theme-toggle__icon--moon">🌙</span>
+                    </span>
+                </button>
+            </div>
         </div>
     </header>
     <main>
@@ -79,6 +109,25 @@
     </main>
     <footer>
         <p>&copy; 2025 My To-Do List App. Educational project for learning web development.</p>
+        <div class="theme-toggle-container theme-toggle-container--mobile">
+            <button
+                id="theme-toggle-mobile"
+                class="theme-toggle theme-toggle--mobile"
+                type="button"
+                role="switch"
+                data-theme-toggle="mobile"
+                aria-label="Switch to dark mode"
+                aria-checked="false"
+                title="Switch to dark mode"
+            >
+                <span class="sr-only">Toggle light and dark theme</span>
+                <span class="theme-toggle__track" aria-hidden="true">
+                    <span class="theme-toggle__thumb"></span>
+                    <span class="theme-toggle__icon theme-toggle__icon--sun">☀️</span>
+                    <span class="theme-toggle__icon theme-toggle__icon--moon">🌙</span>
+                </span>
+            </button>
+        </div>
     </footer>
     <script src="app.js"></script>
 </body>
