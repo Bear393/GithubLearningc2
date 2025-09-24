@@ -1,7 +1,7 @@
 # GithubLearningc2
 My personal project for building a simple to-do list web app while learning Git, HTML, CSS, and JavaScript fundamentals at my own pace.
 
-Updated 20 Sep 2025 11:16
+Updated 24 Sep 2025 15:00
 
 ## Project Overview
 This repository chronicles the minimalist task manager I am crafting to run entirely in the browser. It is tailored specifically for how I like to organize tasks and experiment with GitHub workflows.
