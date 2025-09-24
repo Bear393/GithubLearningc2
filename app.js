@@ -11,10 +11,13 @@
  * Educational Note: Centralized state makes the app easier to debug and maintain
  */
 const appState = {
-    tasks: [],           // Array to hold all tasks
+    tasks: [],            // Array to hold all tasks
     currentFilter: 'all', // Current filter: 'all', 'active', 'completed'
     editingTaskId: null,  // ID of task currently being edited
-    theme: null          // 'light' or 'dark' - resolved on initialization
+    theme: null,          // Currently applied theme ('light' or 'dark')
+    themePreference: 'system', // User preference: 'light', 'dark', or 'system'
+    systemThemeMediaQuery: null,
+    systemThemeChangeHandler: null
 };
 
 /**
@@ -354,7 +357,8 @@ class TaskList {
                 lastSaved: new Date().toISOString(),
                 settings: {
                     currentFilter: appState.currentFilter,
-                    theme: appState.theme || 'light'
+                    theme: appState.theme || 'light',
+                    themePreference: appState.themePreference || 'system'
                 }
             };
 
@@ -412,6 +416,14 @@ class TaskList {
             if (parsedData.settings) {
                 appState.currentFilter = parsedData.settings.currentFilter || 'all';
                 const storedTheme = parsedData.settings.theme;
+                const storedThemePreference = parsedData.settings.themePreference;
+
+                if (storedThemePreference === 'light' || storedThemePreference === 'dark' || storedThemePreference === 'system') {
+                    appState.themePreference = storedThemePreference;
+                } else if (storedTheme === 'dark' || storedTheme === 'light') {
+                    appState.themePreference = storedTheme;
+                }
+
                 if (storedTheme === 'dark' || storedTheme === 'light') {
                     appState.theme = storedTheme;
                 }
@@ -627,11 +639,11 @@ function setupEventHandlers() {
     // Keyboard shortcuts
     document.addEventListener('keydown', handleKeyboardShortcuts);
 
-    // Theme toggle button
-    const themeToggle = document.getElementById('theme-toggle');
-    if (themeToggle) {
-        themeToggle.addEventListener('click', handleThemeToggle);
-    }
+    // Theme toggle buttons (desktop and mobile)
+    const themeToggleButtons = document.querySelectorAll('[data-theme-toggle]');
+    themeToggleButtons.forEach(button => {
+        button.addEventListener('click', handleThemeToggle);
+    });
 
     console.log('Event handlers set up successfully');
 }
@@ -640,23 +652,35 @@ function setupEventHandlers() {
  * Initialize theme based on saved preference or system settings
  */
 function initializeTheme() {
-    let resolvedTheme = appState.theme;
+    setupSystemThemeListener();
 
-    if (resolvedTheme !== 'light' && resolvedTheme !== 'dark') {
-        const prefersDark =
-            window.matchMedia &&
-            window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-        resolvedTheme = prefersDark ? 'dark' : 'light';
-    }
-
-    setTheme(resolvedTheme);
+    const initialPreference = validateThemePreference(appState.themePreference);
+    setThemePreference(initialPreference);
 }
 
 /**
- * Apply selected theme to the document
+ * Ensure theme preference is one of the supported values
  */
-function setTheme(theme) {
+function validateThemePreference(preference) {
+    return preference === 'dark' || preference === 'light' || preference === 'system'
+        ? preference
+        : 'system';
+}
+
+/**
+ * Determine the system color scheme preference
+ */
+function getSystemThemePreference() {
+    if (typeof window !== 'undefined' && window.matchMedia) {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    return 'light';
+}
+
+/**
+ * Apply a specific theme to the document
+ */
+function applyTheme(theme) {
     const normalizedTheme = theme === 'dark' ? 'dark' : 'light';
     appState.theme = normalizedTheme;
 
@@ -665,31 +689,123 @@ function setTheme(theme) {
 }
 
 /**
- * Update the theme toggle button icon and accessible labels
+ * Persist the theme preference and update the UI
  */
-function updateThemeToggleButton() {
-    const themeToggle = document.getElementById('theme-toggle');
-    if (!themeToggle) return;
+function setThemePreference(preference) {
+    const normalizedPreference = validateThemePreference(preference);
+    appState.themePreference = normalizedPreference;
 
-    const isDark = appState.theme === 'dark';
-    const iconElement = themeToggle.querySelector('.theme-icon');
+    const themeToApply =
+        normalizedPreference === 'system'
+            ? getSystemThemePreference()
+            : normalizedPreference;
 
-    if (iconElement) {
-        iconElement.textContent = isDark ? '☀️' : '🌙';
+    applyTheme(themeToApply);
+}
+
+/**
+ * Listen for system preference changes when following the system theme
+ */
+function setupSystemThemeListener() {
+    if (!window.matchMedia) {
+        return;
     }
 
-    const label = isDark ? 'Switch to light mode' : 'Switch to dark mode';
-    themeToggle.setAttribute('aria-label', label);
-    themeToggle.setAttribute('title', label);
-    themeToggle.setAttribute('aria-pressed', String(isDark));
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+    if (appState.systemThemeMediaQuery && appState.systemThemeChangeHandler) {
+        const previousMediaQuery = appState.systemThemeMediaQuery;
+        const previousHandler = appState.systemThemeChangeHandler;
+
+        if (typeof previousMediaQuery.removeEventListener === 'function') {
+            previousMediaQuery.removeEventListener('change', previousHandler);
+        } else if (typeof previousMediaQuery.removeListener === 'function') {
+            previousMediaQuery.removeListener(previousHandler);
+        }
+    }
+
+    const handleChange = event => {
+        if (appState.themePreference === 'system') {
+            const theme = event.matches ? 'dark' : 'light';
+            applyTheme(theme);
+
+            if (todoApp) {
+                todoApp.saveToStorage();
+            }
+        }
+    };
+
+    if (typeof mediaQuery.addEventListener === 'function') {
+        mediaQuery.addEventListener('change', handleChange);
+    } else if (typeof mediaQuery.addListener === 'function') {
+        mediaQuery.addListener(handleChange);
+    }
+
+    appState.systemThemeMediaQuery = mediaQuery;
+    appState.systemThemeChangeHandler = handleChange;
+}
+
+/**
+ * Update the theme toggle button state and accessibility labels
+ */
+function determineNextThemePreference() {
+    const currentPreference = validateThemePreference(appState.themePreference);
+
+    if (currentPreference === 'system') {
+        const currentTheme = appState.theme === 'dark' ? 'dark' : 'light';
+        return currentTheme === 'dark' ? 'light' : 'dark';
+    }
+
+    if (currentPreference === 'dark') {
+        return 'light';
+    }
+
+    return 'system';
+}
+
+function updateThemeToggleButton() {
+    const themeToggleButtons = document.querySelectorAll('[data-theme-toggle]');
+    if (themeToggleButtons.length === 0) return;
+
+    const isDark = appState.theme === 'dark';
+    const nextPreference = determineNextThemePreference();
+    let label;
+
+    switch (nextPreference) {
+        case 'dark':
+            label = 'Switch to dark mode';
+            break;
+        case 'light':
+            label = 'Switch to light mode';
+            break;
+        default:
+            label = 'Follow system theme';
+            break;
+    }
+
+    themeToggleButtons.forEach(button => {
+        button.setAttribute('aria-label', label);
+        button.setAttribute('title', label);
+        button.setAttribute('aria-checked', String(isDark));
+        button.removeAttribute('aria-pressed');
+        button.classList.toggle('theme-toggle--dark', isDark);
+        button.dataset.theme = appState.theme;
+        button.dataset.preference = appState.themePreference;
+        button.dataset.nextPreference = nextPreference;
+    });
 }
 
 /**
  * Handle theme toggle button click
  */
-function handleThemeToggle() {
-    const newTheme = appState.theme === 'dark' ? 'light' : 'dark';
-    setTheme(newTheme);
+function handleThemeToggle(event) {
+    if (event && typeof event.preventDefault === 'function') {
+        event.preventDefault();
+    }
+
+    const nextPreference = determineNextThemePreference();
+
+    setThemePreference(nextPreference);
 
     if (todoApp) {
         todoApp.saveToStorage();
