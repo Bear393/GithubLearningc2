@@ -64,8 +64,8 @@ Follow the steps below to preview the static site at `http://localhost:3000`.
 
 ## Tips
 1. Always use simple name
-        1. Helps others to remember
-        2. :joy:
+  1. Helps others to remember
+  2. :joy:
 
 ## Resources
 1. [Git Tutorial][1]
