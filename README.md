@@ -9,7 +9,7 @@ This repository chronicles the minimalist task manager I am crafting to run enti
 I use the project as a sandbox to understand how HTML structures the page, how CSS adds visual polish, and how JavaScript brings interactivity to the to-do list.
 
 ## Features
-- Browser-based task list you can view by opening `[index.html][4]` directly.
+- Browser-based task list you can view by opening [`index.html`][4] directly.
 - Simple styling with `style.css` so you can experiment with layout, colors, and typography.
 - Interactive task management powered by `app.js`, where you can add, toggle, and organize items.
 - Lightweight setup that helps me focus on learning Git commits, branches, and pull requests.
